@@ -1,7 +1,7 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-const box = 20; // ukuran kotak
+const box = 20;
 let snake = [];
 snake[] = { x: 9 * box, y: 10 * box };
 
@@ -13,29 +13,54 @@ let food = {
 let score = ;
 let d;
 
-document.addEventListener("keydown", direction);
+// --- DETEKSI SWIPE UNTUK HP ---
+let touchStartX = ;
+let touchStartY = ;
+let touchEndX = ;
+let touchEndY = ;
 
-function direction(event) {
-    if(event.keyCode === 37 && d !== "RIGHT") {
-        d = "LEFT";
-    } else if(event.keyCode === 38 && d !== "DOWN") {
-        d = "UP";
-    } else if(event.keyCode === 39 && d !== "LEFT") {
-        d = "RIGHT";
-    } else if(event.keyCode === 40 && d !== "UP") {
-        d = "DOWN";
+canvas.addEventListener("touchstart", (e) => {
+    touchStartX = e.changedTouches[].screenX;
+    touchStartY = e.changedTouches[].screenY;
+});
+
+canvas.addEventListener("touchend", (e) => {
+    touchEndX = e.changedTouches[].screenX;
+    touchEndY = e.changedTouches[].screenY;
+    handleSwipe();
+});
+
+function handleSwipe() {
+    let deltaX = touchEndX - touchStartX;
+    let deltaY = touchEndY - touchStartY;
+
+    if(Math.abs(deltaX) > Math.abs(deltaY)) {
+        // Geser horizontal
+        if(deltaX >  && d !== "LEFT") {
+            d = "RIGHT";
+        } else if(deltaX <  && d !== "RIGHT") {
+            d = "LEFT";
+        }
+    } else {
+        // Geser vertikal
+        if(deltaY >  && d !== "UP") {
+            d = "DOWN";
+        } else if(deltaY <  && d !== "DOWN") {
+            d = "UP";
+        }
     }
 }
 
+// --- FUNGSI GAMENYA ---
 function draw() {
     ctx.fillStyle = "black";
     ctx.fillRect(, , 400, 400);
 
-    // Ular
+    // Gambar ular
     for(let i = ; i < snake.length; i++) {
         ctx.fillStyle = (i === ) ? "lime" : "white";
         ctx.fillRect(snake[i].x, snake[i].y, box, box);
-        
+
         ctx.strokeStyle = "black";
         ctx.strokeRect(snake[i].x, snake[i].y, box, box);
     }
@@ -53,7 +78,7 @@ function draw() {
     if(d === "RIGHT") snakeX += box;
     if(d === "DOWN") snakeY += box;
 
-    // Jika makan makanan
+    // Makan
     if(snakeX === food.x && snakeY === food.y) {
         score++;
         document.getElementById("score").innerText = score;
@@ -62,13 +87,11 @@ function draw() {
             y: Math.floor(Math.random() * 20) * box
         };
     } else {
-        snake.pop(); // hapus ekor
+        snake.pop();
     }
 
-    // Tambahkan kepala baru
     let newHead = { x: snakeX, y: snakeY };
 
-    // Game Over kondisi
     if(snakeX <  || snakeX >= 400 || snakeY <  || snakeY >= 400 || collision(newHead, snake)) {
         clearInterval(game);
         alert("Game Over! Skor akhir: " + score);
@@ -86,4 +109,4 @@ function collision(head, array) {
     return false;
 }
 
-let game = setInterval(draw, 100);
+let game = setInterval(draw, 150);
